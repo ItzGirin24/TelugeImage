@@ -1,267 +1,304 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TelugeImage - Photo Upload Gallery</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TelugeImage - Clean Photo Upload Gallery</title>
   <link rel="icon" href="logo Teluge.jpg" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
     body {
-      font-family: 'Quicksand', sans-serif;
-      background: linear-gradient(135deg, #86efac, #4ade80);
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 1rem;
+      font-family: 'Inter', sans-serif;
+      background: #f0fdf4;
+      color: #065f46;
+    }
+    .header {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      border-radius: 0 0 1rem 1rem;
     }
     .container {
-      background: white;
-      border-radius: 1.5rem;
-      box-shadow: 0 25px 40px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 600px;
-      padding: 2rem 2rem 3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    h1 {
-      font-weight: 700;
-      font-size: 2.5rem;
-      color: #166534;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    p.desc {
-      font-weight: 500;
-      color: #065f46;
-      font-size: 1.1rem;
-      text-align: center;
-      margin-bottom: 2rem;
-      line-height: 1.4;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
     }
     .upload-section {
-      width: 100%;
+      background: white;
+      border: 1px solid #d1fae5;
+      border-radius: 0.5rem;
+      padding: 2rem;
       margin-bottom: 2rem;
-    }
-    #photoInput {
-      width: 100%;
-      padding: 1rem;
-      border: 2px dashed #22c55e;
-      border-radius: 1rem;
-      background: #d9f99d;
-      cursor: pointer;
-      font-weight: 600;
-      color: #166534;
-      transition: background-color 0.3s ease;
-    }
-    #photoInput:hover {
-      background-color: #bef264;
-    }
-    #uploadBtn {
-      margin-top: 1rem;
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
-      color: white;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 1rem;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(34, 197, 94, 0.5);
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      display: none;
-    }
-    #uploadBtn:hover {
-      background-color: #15803d;
-      transform: scale(1.05);
+      box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
     }
     .gallery {
-      width: 100%;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
     }
-    .gallery-item {
-      background: #f0fdf4;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+    .card {
+      background: white;
+      border: 1px solid #d1fae5;
+      border-radius: 0.5rem;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: box-shadow 0.3s ease;
+      box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
+      transition: box-shadow 0.2s;
     }
-    .gallery-item:hover {
-      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+    .card:hover {
+      box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
     }
-    .gallery-item img {
+    .card img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
-      border-bottom: 3px solid #22c55e;
-      border-radius: 1rem 1rem 0 0;
-      user-select: none;
+      border-bottom: 1px solid #d1fae5;
     }
-    .controls {
+    .card-controls {
       padding: 1rem;
       display: flex;
-      gap: 0.75rem;
-      align-items: center;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     .url-input {
-      flex: 1;
-      padding: 0.5rem 1rem;
-      border: 2px solid #22c55e;
-      border-radius: 1rem;
-      font-size: 0.9rem;
-      background: #d9f99d;
-      color: #166534;
-      user-select: all;
+      border: 1px solid #22c55e;
+      border-radius: 0.25rem;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+      width: 100%;
+      background: #f0fdf4;
       resize: none;
-      font-family: 'Quicksand', sans-serif;
     }
     .copy-btn {
       background: #16a34a;
       color: white;
       border: none;
-      border-radius: 1rem;
+      border-radius: 0.25rem;
       padding: 0.5rem 1rem;
-      font-weight: 700;
-      font-size: 0.9rem;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.5);
-      transition: background-color 0.3s ease;
+      font-size: 0.875rem;
+      transition: background 0.2s;
     }
     .copy-btn:hover {
-      background-color: #15803d;
+      background: #15803d;
+    }
+    .file-input {
+      border: 1px dashed #22c55e;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      text-align: center;
+      background: #f0fdf4;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .file-input:hover {
+      background: #d1fae5;
+    }
+    .upload-btn {
+      display: none;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      width: 100%;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .upload-btn:hover {
+      background: #16a34a;
     }
     .no-images {
+      grid-column: 1 / -1;
       text-align: center;
-      color: #166534;
-      font-weight: 600;
-      font-size: 1.2rem;
-      padding: 3rem 1rem;
-      background: #d9f99d;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
-      user-select: none;
+      padding: 3rem;
+      color: #16a34a;
+      background: white;
+      border: 1px solid #d1fae5;
+      border-radius: 0.5rem;
     }
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 2rem;
+    .toast {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: #22c55e;
+      color: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+    }
+    @media (max-width: 768px) {
+      .gallery {
+        grid-template-columns: 1fr;
+        gap: 1rem;
       }
-      #photoInput {
-        padding: 0.75rem;
-        font-size: 1rem;
+      .container {
+        padding: 1rem;
       }
-      #uploadBtn {
-        font-size: 1rem;
-        padding: 0.85rem;
+      .header {
+        padding: 1.5rem 0.5rem;
       }
-      .gallery-item img {
-        height: 140px;
+      .upload-section {
+        padding: 1.5rem;
       }
-      .url-input {
-        font-size: 0.85rem;
-      }
-      .copy-btn {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.75rem;
+      .card img {
+        height: 150px;
       }
     }
   </style>
 </head>
 <body>
-  <main class="container" role="main" aria-label="Photo upload gallery TelugeImage">
-    <h1>TelugeImage</h1>
-    <p class="desc">Upload foto dari perangkat Anda dan dapatkan URL yang bisa disalin untuk thumbnail gambar.</p>
+  <div class="header">
+    <h1 class="text-3xl font-semibold mb-2">TelugeImage</h1>
+    <p>Upload and share photos with ease</p>
+  </div>
 
-    <section class="upload-section" aria-label="Upload photos section">
-      <input type="file" id="photoInput" multiple accept="image/*" aria-describedby="upload-desc" aria-label="Pilih foto untuk diupload" />
-      <button id="uploadBtn" aria-live="polite" aria-label="Upload selected photos">Upload Selected Photos</button>
-      <p id="upload-desc" class="desc" style="font-size: 0.9rem; color: #166534; margin-top: 0.5rem;">
-        Pilih beberapa foto dari perangkat Anda untuk ditambahkan ke galeri publik.
-      </p>
-    </section>
+  <div class="container">
+    <div class="upload-section">
+      <h2 class="text-xl font-medium mb-4">Upload Photos</h2>
+      <div class="file-input" id="fileDropArea">
+        <p>Drag & drop files here or click to browse</p>
+        <input type="file" id="photoInput" multiple accept="image/*" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
+      </div>
+      <button class="upload-btn" id="uploadBtn">Upload Selected Photos</button>
+      <p class="text-sm text-green-700 mt-2">Supported formats: JPG, PNG, GIF. Maximum 10MB per file.</p>
+    </div>
 
-    <section id="gallery" class="gallery" aria-live="polite" aria-label="Uploaded photos gallery">
-      <p class="no-images">Belum ada foto yang diupload. Silakan upload foto untuk memulai!</p>
-    </section>
-  </main>
+    <div class="gallery" id="gallery">
+      <div class="no-images">
+        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/822efe81-5718-46ce-a9c6-05cd6f897431.png" alt="Placeholder image showing empty photo gallery with green theme, rectangular layout with subtle green gradient and text suggesting to upload photos" style="margin-bottom: 1rem; border-radius: 0.5rem;">
+        <p>No photos uploaded yet. Select photos to get started.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Notification</div>
 
   <script>
     const photoInput = document.getElementById('photoInput');
     const uploadBtn = document.getElementById('uploadBtn');
     const gallery = document.getElementById('gallery');
+    const toast = document.getElementById('toast');
+    const fileDropArea = document.getElementById('fileDropArea');
 
     let uploadedImages = JSON.parse(localStorage.getItem('uploadedImages')) || [];
 
-    // Tampilkan tombol upload hanya jika ada file yang dipilih
+    // Show upload button when files are selected
     photoInput.addEventListener('change', () => {
-      uploadBtn.style.display = photoInput.files.length > 0 ? 'block' : 'none';
+      if (photoInput.files.length > 0) {
+        uploadBtn.style.display = 'block';
+      } else {
+        uploadBtn.style.display = 'none';
+      }
     });
 
-    // Render galeri foto
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      fileDropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    fileDropArea.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      photoInput.files = files;
+      photoInput.dispatchEvent(new Event('change'));
+    }
+
+    // Render gallery
     function renderGallery() {
       gallery.innerHTML = '';
       if (uploadedImages.length === 0) {
-        gallery.innerHTML = '<p class="no-images">Belum ada foto yang diupload. Silakan upload foto untuk memulai!</p>';
+        gallery.innerHTML = `
+          <div class="no-images">
+            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/25b02961-85d7-4219-a695-d50ee375fcc0.png" alt="Placeholder image showing empty photo gallery with green theme, rectangular layout with subtle green gradient and text suggesting to upload photos" style="margin-bottom: 1rem; border-radius: 0.5rem;">
+            <p>No photos uploaded yet. Select photos to get started.</p>
+          </div>
+        `;
         return;
       }
       uploadedImages.forEach((src, index) => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        item.innerHTML = `
-          <img src="${src}" alt="Foto pengguna nomor ${index + 1}" loading="lazy" />
-          <div class="controls">
-            <textarea class="url-input" readonly aria-label="URL foto nomor ${index + 1}">${src}</textarea>
-            <button class="copy-btn" onclick="copyToClipboard('${src}')" aria-label="Salin URL foto nomor ${index + 1}">Salin URL</button>
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${src}" alt="Uploaded photo ${index + 1} in green-themed gallery, displaying user-submitted image for viewing and sharing">
+          <div class="card-controls">
+            <textarea class="url-input" readonly>${src}</textarea>
+            <button class="copy-btn" onclick="copyToClipboard('${src}')">Copy URL</button>
           </div>
         `;
-        gallery.appendChild(item);
+        gallery.appendChild(card);
       });
     }
 
-    // Salin URL ke clipboard dengan notifikasi
+    // Copy to clipboard
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        alert('URL berhasil disalin! Anda dapat menggunakannya sebagai thumbnail gambar.');
+        showToast('URL copied to clipboard', 'success');
       }).catch(() => {
-        alert('Gagal menyalin URL. Silakan salin secara manual.');
+        showToast('Failed to copy URL', 'error');
       });
     }
 
-    // Handler upload
+    // Toast notification
+    function showToast(message, type) {
+      toast.textContent = message;
+      toast.style.background = type === 'success' ? '#22c55e' : '#dc2626';
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    // Upload handler
     uploadBtn.addEventListener('click', () => {
       const files = photoInput.files;
       if (files.length === 0) {
-        alert('Silakan pilih minimal satu foto untuk diupload.');
+        showToast('Please select at least one photo', 'error');
         return;
       }
+      for (let file of files) {
+        if (!file.type.startsWith('image/')) {
+          showToast('Please select only image files', 'error');
+          return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          showToast('File too large (max 10MB)', 'error');
+          return;
+        }
+      }
+      let processed = 0;
       Array.from(files).forEach(file => {
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            uploadedImages.push(e.target.result);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedImages.push(e.target.result);
+          processed++;
+          if (processed === files.length) {
             localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
             renderGallery();
-          };
-          reader.readAsDataURL(file);
-        } else {
-          alert('Hanya file gambar yang diperbolehkan.');
-        }
+            uploadBtn.style.display = 'none';
+            photoInput.value = '';
+            showToast('Photos uploaded successfully', 'success');
+          }
+        };
+        reader.readAsDataURL(file);
       });
-      photoInput.value = '';
-      uploadBtn.style.display = 'none';
     });
 
-    // Render awal
+    // Initial render
     renderGallery();
   </script>
 </body>
 </html>
+</content>
+</create_file>
