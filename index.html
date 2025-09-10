@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TelugeImage - Clean Photo Upload Gallery</title>
-  <link rel="icon" href="logo Teluge.jpg" type="image/x-icon">
+  <title>TelugeImage - Upload Permanen</title>
+  <link rel="icon" href="logo Teluge.jpg" type="image/x-icon" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f0fdf4;
-      color: #065f46;
+      font-family: 'Quicksand', sans-serif;
+      background-color: #f0fdf4;
     }
     .header {
       background: linear-gradient(135deg, #16a34a, #22c55e);
@@ -21,7 +23,7 @@
       border-radius: 0 0 1rem 1rem;
     }
     .container {
-      max-width: 1200px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 2rem;
     }
@@ -31,7 +33,6 @@
       border-radius: 0.5rem;
       padding: 2rem;
       margin-bottom: 2rem;
-      box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
     }
     .gallery {
       display: grid;
@@ -44,31 +45,23 @@
       border-radius: 0.5rem;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
-      transition: box-shadow 0.2s;
-    }
-    .card:hover {
-      box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
     }
     .card img {
       width: 100%;
       height: 200px;
       object-fit: cover;
-      border-bottom: 1px solid #d1fae5;
     }
     .card-controls {
       padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
     }
     .url-input {
-      border: 1px solid #22c55e;
-      border-radius: 0.25rem;
-      padding: 0.5rem;
-      font-size: 0.875rem;
       width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #22c55e;
       background: #f0fdf4;
+      border-radius: 0.5rem;
       resize: none;
+      margin-bottom: 0.5rem;
     }
     .copy-btn {
       background: #16a34a;
@@ -77,47 +70,6 @@
       border-radius: 0.25rem;
       padding: 0.5rem 1rem;
       cursor: pointer;
-      font-size: 0.875rem;
-      transition: background 0.2s;
-    }
-    .copy-btn:hover {
-      background: #15803d;
-    }
-    .file-input {
-      border: 1px dashed #22c55e;
-      border-radius: 0.5rem;
-      padding: 2rem;
-      text-align: center;
-      background: #f0fdf4;
-      margin-bottom: 1rem;
-      position: relative;
-    }
-    .file-input:hover {
-      background: #d1fae5;
-    }
-    .upload-btn {
-      display: none;
-      background: #22c55e;
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      width: 100%;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-    .upload-btn:hover {
-      background: #16a34a;
-    }
-    .no-images {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 3rem;
-      color: #16a34a;
-      background: white;
-      border: 1px solid #d1fae5;
-      border-radius: 0.5rem;
     }
     .toast {
       position: fixed;
@@ -127,178 +79,137 @@
       color: white;
       padding: 1rem;
       border-radius: 0.5rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: none;
       z-index: 1000;
-    }
-    @media (max-width: 768px) {
-      .gallery {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      .container {
-        padding: 1rem;
-      }
-      .header {
-        padding: 1.5rem 0.5rem;
-      }
-      .upload-section {
-        padding: 1.5rem;
-      }
-      .card img {
-        height: 150px;
-      }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1 class="text-3xl font-semibold mb-2">TelugeImage</h1>
-    <p>Upload and share photos with ease</p>
+    <h1 class="text-3xl font-bold mb-2">TelugeImage</h1>
+    <p>Upload dan bagikan foto secara permanen</p>
   </div>
 
   <div class="container">
     <div class="upload-section">
-      <h2 class="text-xl font-medium mb-4">Upload Photos</h2>
-      <div class="file-input" id="fileDropArea">
-        <p>Drag & drop files here or click to browse</p>
-        <input type="file" id="photoInput" multiple accept="image/*" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
-      </div>
-      <button class="upload-btn" id="uploadBtn">Upload Selected Photos</button>
-      <p class="text-sm text-green-700 mt-2">Supported formats: JPG, PNG, GIF. Maximum 10MB per file.</p>
+      <h2 class="text-xl font-medium mb-4">Upload Foto</h2>
+      <input type="file" id="photoInput" multiple accept="image/*" class="block w-full mb-4" />
+      <button id="uploadBtn" class="upload-btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Upload Foto</button>
+      <p class="text-sm text-green-700 mt-2">Maks: 10MB per file. Format: JPG, PNG, GIF</p>
     </div>
 
-    <div class="gallery" id="gallery">
-      <div class="no-images">
-        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/822efe81-5718-46ce-a9c6-05cd6f897431.png" alt="Placeholder image showing empty photo gallery with green theme, rectangular layout with subtle green gradient and text suggesting to upload photos" style="margin-bottom: 1rem; border-radius: 0.5rem;">
-        <p>No photos uploaded yet. Select photos to get started.</p>
-      </div>
+    <div id="gallery" class="gallery">
+      <div class="no-images col-span-full text-center text-green-700">Belum ada foto. Upload untuk mulai!</div>
     </div>
   </div>
 
-  <div class="toast" id="toast">Notification</div>
+  <div class="toast" id="toast">Notifikasi</div>
 
   <script>
-    const photoInput = document.getElementById('photoInput');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const gallery = document.getElementById('gallery');
-    const toast = document.getElementById('toast');
-    const fileDropArea = document.getElementById('fileDropArea');
+    // ✅ Firebase config (GANTI DENGAN PUNYAMU)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-    let uploadedImages = JSON.parse(localStorage.getItem('uploadedImages')) || [];
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+    const firestore = firebase.firestore();
 
-    // Show upload button when files are selected
-    photoInput.addEventListener('change', () => {
-      if (photoInput.files.length > 0) {
-        uploadBtn.style.display = 'block';
-      } else {
-        uploadBtn.style.display = 'none';
-      }
-    });
+    const photoInput = document.getElementById("photoInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const gallery = document.getElementById("gallery");
+    const toast = document.getElementById("toast");
 
-    // Drag and drop functionality
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      fileDropArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    fileDropArea.addEventListener('drop', handleDrop, false);
-
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    function handleDrop(e) {
-      const dt = e.dataTransfer;
-      const files = dt.files;
-      photoInput.files = files;
-      photoInput.dispatchEvent(new Event('change'));
-    }
-
-    // Render gallery
-    function renderGallery() {
-      gallery.innerHTML = '';
-      if (uploadedImages.length === 0) {
-        gallery.innerHTML = `
-          <div class="no-images">
-            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/25b02961-85d7-4219-a695-d50ee375fcc0.png" alt="Placeholder image showing empty photo gallery with green theme, rectangular layout with subtle green gradient and text suggesting to upload photos" style="margin-bottom: 1rem; border-radius: 0.5rem;">
-            <p>No photos uploaded yet. Select photos to get started.</p>
-          </div>
-        `;
+    // ✅ Upload dan simpan URL
+    uploadBtn.addEventListener("click", async () => {
+      const files = photoInput.files;
+      if (!files.length) {
+        showToast("Pilih foto terlebih dahulu", false);
         return;
       }
-      uploadedImages.forEach((src, index) => {
-        const card = document.createElement('div');
-        card.className = 'card';
+
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) {
+          showToast("Hanya file gambar diperbolehkan", false);
+          return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          showToast("Ukuran file maksimal 10MB", false);
+          return;
+        }
+
+        try {
+          const ref = storage.ref().child("images/" + Date.now() + "_" + file.name);
+          const snapshot = await ref.put(file);
+          const url = await snapshot.ref.getDownloadURL();
+
+          await firestore.collection("uploadedImages").add({
+            url,
+            uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          showToast("Foto berhasil diupload!");
+        } catch (err) {
+          console.error(err);
+          showToast("Gagal mengupload foto", false);
+        }
+      }
+
+      photoInput.value = "";
+      loadGallery();
+    });
+
+    // ✅ Load dari Firestore
+    async function loadGallery() {
+      gallery.innerHTML = "";
+      const snapshot = await firestore.collection("uploadedImages").orderBy("uploadedAt", "desc").get();
+
+      if (snapshot.empty) {
+        gallery.innerHTML = `<div class="no-images col-span-full text-center text-green-700">Belum ada foto. Upload untuk mulai!</div>`;
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.className = "card";
         card.innerHTML = `
-          <img src="${src}" alt="Uploaded photo ${index + 1} in green-themed gallery, displaying user-submitted image for viewing and sharing">
+          <img src="${data.url}" alt="Foto pengguna">
           <div class="card-controls">
-            <textarea class="url-input" readonly>${src}</textarea>
-            <button class="copy-btn" onclick="copyToClipboard('${src}')">Copy URL</button>
+            <textarea class="url-input" readonly>${data.url}</textarea>
+            <button class="copy-btn" onclick="copyToClipboard('${data.url}')">Salin URL</button>
           </div>
         `;
         gallery.appendChild(card);
       });
     }
 
-    // Copy to clipboard
+    // ✅ Salin ke clipboard
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        showToast('URL copied to clipboard', 'success');
+        showToast("URL disalin");
       }).catch(() => {
-        showToast('Failed to copy URL', 'error');
+        showToast("Gagal menyalin", false);
       });
     }
 
-    // Toast notification
-    function showToast(message, type) {
+    // ✅ Tampilkan notifikasi
+    function showToast(message, success = true) {
       toast.textContent = message;
-      toast.style.background = type === 'success' ? '#22c55e' : '#dc2626';
-      toast.style.display = 'block';
+      toast.style.backgroundColor = success ? "#22c55e" : "#dc2626";
+      toast.style.display = "block";
       setTimeout(() => {
-        toast.style.display = 'none';
+        toast.style.display = "none";
       }, 3000);
     }
 
-    // Upload handler
-    uploadBtn.addEventListener('click', () => {
-      const files = photoInput.files;
-      if (files.length === 0) {
-        showToast('Please select at least one photo', 'error');
-        return;
-      }
-      for (let file of files) {
-        if (!file.type.startsWith('image/')) {
-          showToast('Please select only image files', 'error');
-          return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-          showToast('File too large (max 10MB)', 'error');
-          return;
-        }
-      }
-      let processed = 0;
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          uploadedImages.push(e.target.result);
-          processed++;
-          if (processed === files.length) {
-            localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
-            renderGallery();
-            uploadBtn.style.display = 'none';
-            photoInput.value = '';
-            showToast('Photos uploaded successfully', 'success');
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    // Initial render
-    renderGallery();
+    // ✅ Load galeri saat halaman dibuka
+    window.addEventListener("load", loadGallery);
   </script>
 </body>
 </html>
-</content>
-</create_file>
